@@ -79,6 +79,14 @@ def get_checker_backtrack_elem_from_constructor (con: IRConstructor) (inpname: L
     var_eq := out_prop.eqs ++ gcc_group.var_eq
   }
 
+def get_checker_backtrack_elems (IR: Expr) (inpname: List String): MetaM (Array backtrack_elem) := do
+  let ir_info ← extract_IR_info_with_inpname IR inpname
+  let mut output := #[]
+  for c in ir_info.constructors do
+    let be ← get_checker_backtrack_elem_from_constructor c inpname
+    output := output.push be
+  return output
+
 def add_size_param (cond: Expr) : MetaM String := do
   let fnname := toString (← Meta.ppExpr cond.getAppFn)
   let arg_str := (toString (← Meta.ppExpr cond)).drop (fnname.length)
@@ -268,6 +276,14 @@ def get_producer_backtrack_elem_from_constructor (con: IRConstructor) (inpname: 
     var_eq := out_prop.eqs ++ gcc_group.var_eq
   }
 
+
+def get_producer_backtrack_elems (IR: Expr) (inpname: List String) (genpos: Nat): MetaM (Array backtrack_elem) := do
+  let ir_info ← extract_IR_info_with_inpname IR inpname
+  let mut output := #[]
+  for c in ir_info.constructors do
+    let be ← get_producer_backtrack_elem_from_constructor c inpname genpos
+    output := output.push be
+  return output
 
 def cbe_if_return_producer (cbe: backtrack_elem) (iden: String) (vars: List String) (monad: String :="IO"): MetaM String := do
   let mut out:= ""
